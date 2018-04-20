@@ -752,19 +752,19 @@ def LeftRightMixed(address, val):
     return _write1(address, Cmd.MIXEDLR, val)
 
 
-def ReadEncM1(address):
+# def ReadEncM1(address):
     return _read4_1(address, Cmd.GETM1ENC)
 
 
-def ReadEncM2(address):
+# def ReadEncM2(address):
     return _read4_1(address, Cmd.GETM2ENC)
 
 
-def ReadSpeedM1(address):
+# def ReadSpeedM1(address):
     return _read4_1(address, Cmd.GETM1SPEED)
 
 
-def ReadSpeedM2(address):
+# def ReadSpeedM2(address):
     return _read4_1(address, Cmd.GETM2SPEED)
 
 
@@ -772,7 +772,7 @@ def ResetEncoders(address):
     return _write0(address, Cmd.RESETENC)
 
 
-def ReadVersion(address):
+# def ReadVersion(address):
     global _crc
     trys = _trystimeout
     while 1:
@@ -804,19 +804,19 @@ def ReadVersion(address):
     return 0, 0
 
 
-def SetEncM1(address, cnt):
+# def SetEncM1(address, cnt):
     return _write4(address, Cmd.SETM1ENCCOUNT, cnt)
 
 
-def SetEncM2(address, cnt):
+# def SetEncM2(address, cnt):
     return _write4(address, Cmd.SETM2ENCCOUNT, cnt)
 
 
-def ReadMainBatteryVoltage(address):
+# def ReadMainBatteryVoltage(address):
     return _read2(address, Cmd.GETMBATT)
 
 
-def ReadLogicBatteryVoltage(address, ):
+# def ReadLogicBatteryVoltage(address, ):
     return _read2(address, Cmd.GETLBATT)
 
 
@@ -924,7 +924,7 @@ def ReadPWMs(address):
     return 0, 0, 0
 
 
-def ReadCurrents(address):
+# def ReadCurrents(address):
     val = _read4(address, Cmd.GETCURRENTS)
     if val[0]:
         cur1 = val[1] >> 16
@@ -1098,7 +1098,7 @@ def RestoreDefaults(address):
     return _write0(address, Cmd.RESTOREDEFAULTS)
 
 
-def ReadTemp(address):
+# def ReadTemp(address):
     return _read2(address, Cmd.GETTEMP)
 
 
@@ -1106,7 +1106,7 @@ def ReadTemp2(address):
     return _read2(address, Cmd.GETTEMP2)
 
 
-def ReadError(address):
+# def ReadError(address):
     return _read2(address, Cmd.GETERROR)
 
 
@@ -1147,11 +1147,11 @@ def GetConfig(address):
     return _read2(address, Cmd.GETCONFIG)
 
 
-def SetM1MaxCurrent(address, max):
+# def SetM1MaxCurrent(address, max):
     return _write44(address, Cmd.SETM1MAXCURRENT, max, 0)
 
 
-def SetM2MaxCurrent(address, max):
+# def SetM2MaxCurrent(address, max):
     return _write44(address, Cmd.SETM2MAXCURRENT, max, 0)
 
 
@@ -1177,7 +1177,7 @@ def ReadPWMMode(address):
     return _read1(address, Cmd.GETPWMMODE)
 
 
-def Open(comport, rate):
+# def Open(comport, rate):
     global port
     port = serial.Serial(comport, baudrate=rate, timeout=0.1, interCharTimeout=0.01)
     return
