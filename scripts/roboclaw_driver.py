@@ -1034,11 +1034,11 @@ def ReadM2PositionPID(address):
     return 0, 0, 0, 0, 0, 0, 0, 0
 
 
-def SpeedAccelDeccelPositionM1(address, accel, speed, deccel, position, buffer):
+# def SpeedAccelDeccelPositionM1(address, accel, speed, deccel, position, buffer):
     return _write44441(address, Cmd.M1SPEEDACCELDECCELPOS, accel, speed, deccel, position, buffer)
 
 
-def SpeedAccelDeccelPositionM2(address, accel, speed, deccel, position, buffer):
+# def SpeedAccelDeccelPositionM2(address, accel, speed, deccel, position, buffer):
     return _write44441(address, Cmd.M2SPEEDACCELDECCELPOS, accel, speed, deccel, position, buffer)
 
 

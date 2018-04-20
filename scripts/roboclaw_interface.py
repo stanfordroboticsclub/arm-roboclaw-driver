@@ -38,6 +38,7 @@ class RoboClaw:
         #     else:
         #         raise
 
+    ##### GENERAL ######
 
     def read_version(self, motor):
         return roboclaw_driver.ReadVersion(self.address[motor])
@@ -54,6 +55,7 @@ class RoboClaw:
     def read_temp(self,motor):
         return roboclaw_driver.ReadTemp(self.address[motor])
 
+    ##### CURRENTS ######
 
     def read_current(self,motor):
         return roboclaw_driver.ReadCurrents(self.address[motor])[self.motor_num[motor]]
@@ -65,6 +67,14 @@ class RoboClaw:
             out = roboclaw_driver.SetM2MaxCurrent(self.address[motor],current)
         return out
 
+    def read_max_current(self,motor):
+        if self.motor_num[motor] == 1:
+            out = roboclaw_driver.ReadM1MaxCurrent(self.address[motor])
+        else:
+            out = roboclaw_driver.ReadM2MaxCurrent(self.address[motor])
+        return out
+
+    ##### ENCODERS ######
 
     def read_encoder(self, motor):
         if self.motor_num[motor] == 1:
@@ -85,5 +95,23 @@ class RoboClaw:
             out = roboclaw_driver.SetEncM1(self.address[motor], val)
         else:
             out = roboclaw_driver.SetEncM2(self.address[motor], val)
+        return out
+
+    ##### CONTROL ######
+
+    def drive_position(self,motor, accel, speed, deccel, position, buffer):
+        if self.motor_num[motor] == 1:
+            out = roboclaw_driver.SpeedAccelDeccelPositionM1(self.address[motor], 
+                                                             accel, speed, deccel, position, buffer)
+        else:
+            out = roboclaw_driver.SpeedAccelDeccelPositionM2(self.address[motor], 
+                                                             accel, speed, deccel, position, buffer)
+        return out
+
+    def drive_duty(self,motor,duty):
+        if self.motor_num[motor] == 1:
+            out = roboclaw_driver.DutyM1(self.address[motor], duty)
+        else:
+            out = roboclaw_driver.DutyM2(self.address[motor], duty)
         return out
 
