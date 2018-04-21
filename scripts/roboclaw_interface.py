@@ -44,8 +44,28 @@ class RoboClaw:
     def read_version(self, motor):
         return roboclaw_driver.ReadVersion(self.address[motor])
 
-    def read_error(self,motor):
-        return roboclaw_driver.ReadError(self.address[motor])
+    def read_status(self,motor):
+        status = roboclaw_driver.ReadError(self.address[motor])
+        if status[0]:
+            return {
+            0x0000: 'Normal',
+            0x0001: 'Warning: High Current - Motor 1',
+            0x0002: 'Warning: High Current - Motor 2',
+            0x0004: 'Emergency Stop Triggered',
+            0x0008: 'Error: High Temperature - Sensor 1',
+            0x0010: 'Error: High Temperature - Sensor 2',
+            0x0020: 'Error: High Voltage - Main Battery',
+            0x0040: 'Error: High Voltage - Logic Battery',
+            0x0080: 'Error: Low Voltage - Logic Battery',
+            0x0100: 'Driver Fault - Motor 1 Driver',
+            0x0200: 'Driver Fault - Motor 2 Driver',
+            0x0400: 'Warning: High Voltage - Main Battery',
+            0x0800: 'Warning: Low Voltage - Main Battery',
+            0x1000: 'Warning: High Temperature - Sensor 1',
+            0x2000: 'Warning: High Temperature - Sensor 2',
+            0x4000: 'Home - Motor 1',
+            0x8000: 'Home - Motor 2'
+        }.get(status[1], 'Unknown Error')
 
     #tenths of a volte
     def read_main_battery_voltage(self, motor):
