@@ -6,20 +6,21 @@ class RoboClaw:
 
     def __init__(self, port, addresses=None, names = None, auto_recover=False):
 
-        if address == None:
-            address = [128]
+        if addresses == None:
+            addresses = [128]
         if names == None:
             names =[1,2]
 
-        assert(2*len(address) == len(names))
+        assert(2*len(addresses) == len(names))
 
         self.port = port
         self.names = names
         self.auto_recover = auto_recover
+        self.driver = roboclaw_driver
 
         self.address = {}
         self.motor_num = {}
-        for i in range(len(address)):
+        for i in range(len(addresses)):
             self.address[names[2*i  ]] = addresses[i]
             self.address[names[2*i+1]] = addresses[i]
 
@@ -43,15 +44,18 @@ class RoboClaw:
     def read_version(self, motor):
         return roboclaw_driver.ReadVersion(self.address[motor])
 
-    def read_error(self,motor)
+    def read_error(self,motor):
         return roboclaw_driver.ReadError(self.address[motor])
 
+    #tenths of a volte
     def read_main_battery_voltage(self, motor):
-        return roboclaw_driver.ReadMainBatteryVoltage(self.address[motor]):
+        return roboclaw_driver.ReadMainBatteryVoltage(self.address[motor])
         
+    # doesn't work, gives 0
     def read_logic_battery_voltage(self, motor):
-        return roboclaw_driver.ReadLogicBatteryVoltage(self.address[motor]):
+        return roboclaw_driver.ReadLogicBatteryVoltage(self.address[motor])
 
+    #tenths of a celcious
     def read_temp(self,motor):
         return roboclaw_driver.ReadTemp(self.address[motor])
 
@@ -76,6 +80,11 @@ class RoboClaw:
 
     ##### ENCODERS ######
 
+    # The status byte tracks counter under ow, direction and over ow. The byte value represents:
+# Bit0 - Counter Under ow (1= Under ow Occurred, Clear After Reading) Bit1 - Direction (0 = Forward, 1 = Backwards)
+# Bit2 - Counter Over ow (1= Under ow Occurred, Clear After Reading) Bit3 - Reserved
+# Bit4 - Reserved Bit5 - Reserved Bit6 - Reserved Bit7 - Reserved
+# 1, val, status
     def read_encoder(self, motor):
         if self.motor_num[motor] == 1:
             out = roboclaw_driver.ReadEncM1(self.address[motor])
@@ -83,6 +92,8 @@ class RoboClaw:
             out = roboclaw_driver.ReadEncM2(self.address[motor])
         return out
 
+    #Receive: [Speed(4 bytes), Status, CRC(2 bytes)]
+    # Status indicates the direction (0 - forward, 1 - backward)
     def read_encoder_speed(self, motor):
         if self.motor_num[motor] == 1:
             out = roboclaw_driver.ReadSpeedM1(self.address[motor])
@@ -108,10 +119,18 @@ class RoboClaw:
                                                              accel, speed, deccel, position, buffer)
         return out
 
+    # The duty value is signed and the range is -32768 to +32767 
     def drive_duty(self,motor,duty):
         if self.motor_num[motor] == 1:
             out = roboclaw_driver.DutyM1(self.address[motor], duty)
         else:
             out = roboclaw_driver.DutyM2(self.address[motor], duty)
+        return out
+
+    def drive_speed(self,motor,speed):
+        if self.motor_num[motor] == 1:
+            out = roboclaw_driver.SpeedM1(self.address[motor], speed)
+        else:
+            out = roboclaw_driver.SpeedM2(self.address[motor], speed)
         return out
 
