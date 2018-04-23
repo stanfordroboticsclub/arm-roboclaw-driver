@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="arm-roboclaw-driver" name="arm_driver" type="arm-driver.py" launch-prefix="sudo -E PYTHONPATH=$(env PYTHONPATH)"/>
+</launch>
