@@ -20,12 +20,24 @@ class RoboClaw:
 
         self.address = {}
         self.motor_num = {}
+        self.acceleration = {}
+        self.decceleration = {}
+        self.speed = {}
+
         for i in range(len(addresses)):
             self.address[names[2*i  ]] = addresses[i]
             self.address[names[2*i+1]] = addresses[i]
 
             self.motor_num[names[2*i  ]] = 1
             self.motor_num[names[2*i+1]] = 2
+
+            self.acceleration[names[2*i  ]] = 0
+            self.acceleration[names[2*i+1]] = 0
+            self.decceleration[names[2*i  ]] = 0
+            self.decceleration[names[2*i+1]] = 0
+
+            self.speed[names[2*i  ]] = 1000
+            self.speed[names[2*i+1]] = 1000
 
         roboclaw_driver.Open(port, 115200)
         # How does this work>
@@ -98,6 +110,15 @@ class RoboClaw:
             out = roboclaw_driver.ReadM2MaxCurrent(self.address[motor])
         return out
 
+
+    ##### CONTROL SETTINGS ######
+
+    def set_position_speeds(self, motor, speed, acceleration, decceleration):
+        self.acceleration[motor] = acceleration
+        self.decceleration[motor] = decceleration
+        self.speed[motor] = speed
+
+
     ##### ENCODERS ######
 
     # The status byte tracks counter under ow, direction and over ow. The byte value represents:
@@ -130,13 +151,15 @@ class RoboClaw:
 
     ##### CONTROL ######
 
-    def drive_position(self,motor, accel, speed, deccel, position, buffer):
+    def drive_position(self,motor, position, buffer=False):
         if self.motor_num[motor] == 1:
             out = roboclaw_driver.SpeedAccelDeccelPositionM1(self.address[motor], 
-                                                             accel, speed, deccel, position, buffer)
+                                                             self.acceleration[motor], self.speed[motor], 
+                                                             self.decceleration[motor], position, buffer)
         else:
             out = roboclaw_driver.SpeedAccelDeccelPositionM2(self.address[motor], 
-                                                             accel, speed, deccel, position, buffer)
+                                                             self.acceleration[motor], self.speed[motor], 
+                                                             self.decceleration[motor], position, buffer)
         return out
 
     # The duty value is signed and the range is -32768 to +32767 
