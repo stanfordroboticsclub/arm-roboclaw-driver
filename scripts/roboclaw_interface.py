@@ -1,4 +1,4 @@
-
+import time
 import roboclaw_driver
 
 
@@ -50,6 +50,18 @@ class RoboClaw:
         #         self.recover_serial()
         #     else:
         #         raise
+
+
+    def recover_serial(self):
+        self.driver.port.close()
+        while not self.driver.port.isOpen():
+            try:
+                self.driver.port.close()
+                self.driver.port.open()
+            except serial.serialutil.SerialException as e:
+                time.sleep(0.2)
+                # logger.warning('failed to recover serial. retrying.')
+                print('can not fix serial :(')
 
     ##### GENERAL ######
 
