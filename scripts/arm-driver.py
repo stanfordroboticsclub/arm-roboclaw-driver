@@ -1,32 +1,25 @@
+#!/usr/bin/env python
 
 
 import rospy
 from sensor_msgs.msg import JointState
 from roboclaw_interface import RoboClaw
 
-
-
-
-def ArmDriver:
+class ArmDriver:
 
     def __init__(self):
+        self.joint_names = ["shoulder",
+                              "elbow"]
+                              # "turret",
+                              # "wrist_pitch",
+                              # "wrist_yaw",
+                              # "wrist_roll",
+                              # "grip"]
 
-
-        msg.joint_names = ["shoulder",
-                              "elbow",
-                              "turret",
-                              "wrist_pitch",
-                              "wrist_yaw",
-                              "wrist_roll",
-                              "grip"]
-
-        msg.convert = { "shoulder" : ( 3 ,4.6 , 150 ,1650),
+        self.convert = { "shoulder" : ( 3 ,4.6 , 150 ,1650),
                        "elbow" : (3.5 , 5.2 , 60, 1400)}
 
-        self.rc = RoboClaw(self.find_serial_port(), names = self.joint_names, addresses = [128, 129, 130])
-
-
-
+        self.rc = RoboClaw(self.find_serial_port(), names = self.joint_names) # addresses = [128, 129, 130])
 
         rospy.init_node('arm-driver', anonymous=True)
 
@@ -41,8 +34,9 @@ def ArmDriver:
             if joint not in ['shoulder', 'elbow']:
                 continue
 
-            ind = data.names.find(joint)
-            if ind == -1:
+            try:
+                ind = data.name.index(joint)
+            except ValueError:
                 continue
 
             length = data.position[ind]
@@ -50,11 +44,12 @@ def ArmDriver:
             self.rc.drive_position(joint, position)
             
     def scale(self, x, joint):
-        return ((x - self.convert[joint][0] ) * (self.convert[joint][3] - self.convert[joint][2]) 
+        return int((x - self.convert[joint][0] ) * (self.convert[joint][3] - self.convert[joint][2]) 
                             / (self.convert[joint][1] - self.convert[joint][0]) + self.convert[joint][2] )
 
 
     def find_serial_port(self):
+        return '/dev/ttyACM0'
         return '/dev/tty.usbmodem1141'
 
 
