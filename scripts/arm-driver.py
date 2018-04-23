@@ -16,6 +16,9 @@ class ArmDriver:
                               # "wrist_roll",
                               # "grip"]
 
+        self.lengths = {'shoulder': 4, 
+                        'elbow': 4}
+
         self.convert = { "shoulder" : ( 3 ,4.6 , 150 ,1650),
                        "elbow" : (3.5 , 5.2 , 60, 1400)}
 
@@ -25,7 +28,13 @@ class ArmDriver:
 
         rospy.Subscriber("/joint_states", JointState, lambda x: self.callback(x) )
 
-        rospy.spin()
+
+        r = rospy.rate(10)
+        while not rospy.is_shutdown():
+            self.write_to_roboclaw()
+            r.sleep()
+            # rospy.spinOnce()
+
 
     def callback(self, data):
 
@@ -33,14 +42,16 @@ class ArmDriver:
 
             if joint not in ['shoulder', 'elbow']:
                 continue
-
             try:
                 ind = data.name.index(joint)
             except ValueError:
                 continue
 
-            length = data.position[ind]
-            position = self.scale(length, joint)
+            self.lengths[joint] = data.position[ind]
+
+    def write_to_roboclaw(self):
+        for joint in self.joint_names:
+            position = self.scale(self.lengths.[joint], joint)
             self.rc.drive_position(joint, position)
             
     def scale(self, x, joint):
