@@ -29,7 +29,7 @@ class ArmDriver:
         rospy.Subscriber("/joint_states", JointState, lambda x: self.callback(x) )
 
 
-        r = rospy.rate(10)
+        r = rospy.Rate(10)
         while not rospy.is_shutdown():
             self.write_to_roboclaw()
             r.sleep()
@@ -51,7 +51,7 @@ class ArmDriver:
 
     def write_to_roboclaw(self):
         for joint in self.joint_names:
-            position = self.scale(self.lengths.[joint], joint)
+            position = self.scale(self.lengths[joint], joint)
             self.rc.drive_position(joint, position)
             
     def scale(self, x, joint):
