@@ -12,7 +12,8 @@ class ArmDriver:
         self.joint_names = ["shoulder",
                               "elbow",
                               "wrist_yaw",
-                              "wrist_roll"]
+                              "wrist_pitch"]
+                              # "wrist_roll",
                               # "turret",
                               # "wrist_pitch",
                               # "grip"]
@@ -50,18 +51,24 @@ class ArmDriver:
         # self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names) # addresses = [128, 129, 130])
         self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names,addresses = [129] ) # addresses = [128, 129, 130])
 
+        self.rc.speed['wrist_L'] = 5000
+        self.rc.speed['wrist_R'] = 5000
+
         rospy.init_node('arm-driver', anonymous=True)
         rospy.Subscriber("/joint_states", JointState, lambda x: self.callback(x) )
 
 
         r = rospy.Rate(10)
         while not rospy.is_shutdown():
+            rospy.loginfo('new loop')
+        # while 1:
             self.write_to_roboclaw()
             r.sleep()
             # rospy.spinOnce()
 
 
     def callback(self, data):
+        rospy.loginfo('callback')
         for joint in self.joint_names:
 
             try:
@@ -71,13 +78,17 @@ class ArmDriver:
 
             self.pos[joint] = data.position[ind]
 
+        
+        rospy.loginfo('call '+str(self.pos['wrist_pitch']) )
+
     def write_to_roboclaw(self):
+        rospy.loginfo('writing')
         for joint in self.manual_names:
-            position = self.scale(self.pos.[joint], joint)
+            position = self.scale(self.pos[joint], joint)
             self.rc.drive_position(joint, position)
 
-        pulse_pitch = self.scale(self.pos.['wrist_pitch'], 'wrist_pitch')
-        pulse_yaw = self.scale(self.pos.['wrist_yaw'], 'wrist_yaw')
+        pulse_pitch = self.scale(self.pos['wrist_pitch'], 'wrist_pitch')
+        pulse_yaw = self.scale(self.pos['wrist_yaw'], 'wrist_yaw')
 
         wrist_L_pulse = pulse_pitch + pulse_yaw
         wrist_R_pulse = pulse_pitch - pulse_yaw
@@ -85,8 +96,12 @@ class ArmDriver:
         wrist_L_pulse = self.clamp(wrist_L_pulse, -10000,10000)
         wrist_R_pulse = self.clamp(wrist_R_pulse, -10000,10000)
 
+        rospy.loginfo('writ '+str(self.pos['wrist_pitch']) )
+        rospy.loginfo('wL')
         self.rc.drive_position('wrist_L', wrist_L_pulse)
+        rospy.loginfo('wR')
         self.rc.drive_position('wrist_R', wrist_R_pulse)
+        rospy.loginfo('done')
 
     def clamp(self,val, mi, ma):
         return min( [ max( [val,mi] ), ma])
