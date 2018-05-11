@@ -54,7 +54,7 @@ class ArmDriver:
         rospy.Subscriber("/joint_states", JointState, lambda x: self.callback(x) )
 
 
-        r = rospy.rate(10)
+        r = rospy.Rate(10)
         while not rospy.is_shutdown():
             self.write_to_roboclaw()
             r.sleep()
