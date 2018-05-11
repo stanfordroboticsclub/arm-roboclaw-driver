@@ -18,20 +18,20 @@ class ArmDriver:
                               # "wrist_pitch",
                               # "grip"]
 
-        self.motor_names = ["wrist_L",
-                              "wrist_R"]
-
-        # self.motor_names = ["shoulder",
-        #                       "elbow",
-        #                       "wrist_L",
+        # self.motor_names = ["wrist_L",
         #                       "wrist_R"]
+
+        self.motor_names = ["shoulder",
+                              "elbow",
+                              "wrist_L",
+                              "wrist_R"]
                               # "turret",
                               # "wrist_pitch",
                               # "grip"]
 
-        self.manual_names = []
-        # self.manual_names = ["shoulder",
-        #                       "elbow"]
+        # self.manual_names = []
+        self.manual_names = ["shoulder",
+                              "elbow"]
                               # "turret",
                               # "wrist_pitch",
                               # "grip"]
@@ -49,7 +49,7 @@ class ArmDriver:
                        }
 
         # self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names) # addresses = [128, 129, 130])
-        self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names,addresses = [129] ) # addresses = [128, 129, 130])
+        self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names,addresses = [128,129] ) # addresses = [128, 129, 130])
 
         self.rc.speed['wrist_L'] = 5000
         self.rc.speed['wrist_R'] = 5000
@@ -96,12 +96,15 @@ class ArmDriver:
         wrist_L_pulse = self.clamp(wrist_L_pulse, -10000,10000)
         wrist_R_pulse = self.clamp(wrist_R_pulse, -10000,10000)
 
-        rospy.loginfo('writ '+str(self.pos['wrist_pitch']) )
-        rospy.loginfo('wL')
-        self.rc.drive_position('wrist_L', wrist_L_pulse)
-        rospy.loginfo('wR')
-        self.rc.drive_position('wrist_R', wrist_R_pulse)
-        rospy.loginfo('done')
+        # rospy.loginfo('writ '+str(self.pos['wrist_pitch']) )
+        # rospy.loginfo('wL')
+        out = self.rc.drive_position('wrist_L', wrist_L_pulse)
+        # rospy.loginfo('wR')
+        out2 = self.rc.drive_position('wrist_R', wrist_R_pulse)
+
+        rospy.loginfo('confirmation')
+        rospy.loginfo(str(out))
+        rospy.loginfo(str(out2))
 
     def clamp(self,val, mi, ma):
         return min( [ max( [val,mi] ), ma])
