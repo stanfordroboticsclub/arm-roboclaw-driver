@@ -4,23 +4,40 @@
 import rospy
 from sensor_msgs.msg import JointState
 from roboclaw_interface import RoboClaw
+import math
 
 class ArmDriver:
 
     def __init__(self):
         self.joint_names = ["shoulder",
+                              "elbow",
+                              "wrist_yaw",
+                              "wrist_roll"]
+                              # "turret",
+                              # "wrist_pitch",
+                              # "grip"]
+
+        self.motor_names = ["shoulder",
+                              "elbow",
+                              "wrist_L",
+                              "wrist_R"]
+                              # "turret",
+                              # "wrist_pitch",
+                              # "grip"]
+
+        self.manual_names = ["shoulder",
                               "elbow"]
                               # "turret",
                               # "wrist_pitch",
-                              # "wrist_yaw",
-                              # "wrist_roll",
                               # "grip"]
 
-        self.lengths = {'shoulder': 4, 
+        self.pos = {'shoulder': 4, 
                         'elbow': 4}
 
         self.convert = { "shoulder" : ( 3 ,4.6 , 150 ,1650),
-                       "elbow" : (3.5 , 5.2 , 60, 1400)}
+                       "elbow" : (3.5 , 5.2 , 60, 1400),
+                       "wrists" : (-math.pi , math.pi , -8000 , 8000),
+                       }
 
         self.rc = RoboClaw(self.find_serial_port(), names = self.joint_names) # addresses = [128, 129, 130])
 
@@ -47,12 +64,20 @@ class ArmDriver:
             except ValueError:
                 continue
 
-            self.lengths[joint] = data.position[ind]
+            self.pos[joint] = data.position[ind]
 
     def write_to_roboclaw(self):
-        for joint in self.joint_names:
-            position = self.scale(self.lengths.[joint], joint)
+        for joint in self.manual_names:
+            position = self.scale(self.pos.[joint], joint)
             self.rc.drive_position(joint, position)
+
+
+        wrist_L_pos = self.pos[wrist_pitch] + self.pos[wrist_yaw] - math.pi
+        wrist_R_pos = self.pos[wrist_pitch] - self.pos[wrist_yaw]
+
+        self.rc.drive_position(joint, position)
+        self.rc.drive_position(joint, position)
+
             
     def scale(self, x, joint):
         return int((x - self.convert[joint][0] ) * (self.convert[joint][3] - self.convert[joint][2]) 
