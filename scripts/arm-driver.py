@@ -40,6 +40,12 @@ class ArmDriver:
                         'elbow': 4,
                     'wrist_pitch': math.pi/2,
                     'wrist_yaw': math.pi/2}
+
+        self.offset = {'shoulder': 0, 
+                        'elbow': 0,
+                    'wrist_pitch': 0,
+                    'wrist_yaw': 0}
+        
                    
 
         self.convert = { "shoulder" : ( 3 ,4.6 , 150 ,1650),
@@ -77,6 +83,7 @@ class ArmDriver:
                 continue
 
             self.pos[joint] = data.position[ind]
+            self.offset[joint] = data.effort[ind]
 
         
         rospy.loginfo('call '+str(self.pos['wrist_pitch']) )
@@ -85,34 +92,36 @@ class ArmDriver:
         rospy.loginfo('writing')
         for joint in self.manual_names:
             position = self.scale(self.pos[joint], joint)
-            self.rc.drive_position(joint, position)
+            offset = int(self.offset[joint])
+            self.rc.drive_position(joint, position + offset)
 
+
+        #Do Manual calc for wrist
         pulse_pitch = self.scale(self.pos['wrist_pitch'], 'wrist_pitch')
         pulse_yaw = self.scale(self.pos['wrist_yaw'], 'wrist_yaw')
 
         wrist_L_pulse = pulse_pitch + pulse_yaw
         wrist_R_pulse = pulse_pitch - pulse_yaw
 
-        wrist_L_pulse = self.clamp(wrist_L_pulse, -10000,10000)
-        wrist_R_pulse = self.clamp(wrist_R_pulse, -10000,10000)
+        wrist_L_pulse = self.clamp(wrist_L_pulse, -10000,10000) + self.offset[ 'wrist_pitch']
+        wrist_R_pulse = self.clamp(wrist_R_pulse, -10000,10000) + self.offset[ 'wrist_yaw']
 
-        # rospy.loginfo('writ '+str(self.pos['wrist_pitch']) )
-        # rospy.loginfo('wL')
         out = self.rc.drive_position('wrist_L', wrist_L_pulse)
-        # rospy.loginfo('wR')
         out2 = self.rc.drive_position('wrist_R', wrist_R_pulse)
 
         rospy.loginfo('confirmation')
         rospy.loginfo(str(out))
-        rospy.loginfo(str(out2))
 
     def clamp(self,val, mi, ma):
         return min( [ max( [val,mi] ), ma])
 
             
     def scale(self, x, joint):
-        return int((x - self.convert[joint][0] ) * (self.convert[joint][3] - self.convert[joint][2]) 
+        out =  int((x - self.convert[joint][0] ) * (self.convert[joint][3] - self.convert[joint][2]) 
                             / (self.convert[joint][1] - self.convert[joint][0]) + self.convert[joint][2] )
+
+        out = self.clamp(out,self.convert[joint][2], self.convert[joint][3])
+        return out
 
 
     def find_serial_port(self):
