@@ -12,11 +12,11 @@ class ArmDriver:
         self.joint_names = ["shoulder",
                               "elbow",
                               "wrist_yaw",
-                              "wrist_pitch"]
+                              "wrist_pitch",
+                              "grip"]
                               # "wrist_roll",
                               # "turret",
                               # "wrist_pitch",
-                              # "grip"]
 
         # self.motor_names = ["wrist_L",
         #                       "wrist_R"]
@@ -24,27 +24,29 @@ class ArmDriver:
         self.motor_names = ["shoulder",
                               "elbow",
                               "wrist_L",
-                              "wrist_R"]
+                              "wrist_R",
+                              "grip"]
                               # "turret",
                               # "wrist_pitch",
-                              # "grip"]
 
         # self.manual_names = []
         self.manual_names = ["shoulder",
-                              "elbow"]
+                              "elbow",
+                              "grip"]
                               # "turret",
                               # "wrist_pitch",
-                              # "grip"]
 
         self.pos = {'shoulder': 4, 
                         'elbow': 4,
                     'wrist_pitch': math.pi/2,
-                    'wrist_yaw': math.pi/2}
+                    'wrist_yaw': math.pi/2,
+                    'grip':1}
 
         self.offset = {'shoulder': 0, 
                         'elbow': 0,
                     'wrist_pitch': 0,
-                    'wrist_yaw': 0}
+                    'wrist_yaw': 0,
+                       'grip':0}
         
                    
 
@@ -52,6 +54,7 @@ class ArmDriver:
                        "elbow" : (3.5 , 5.2 , 60, 1400),
                        "wrist_pitch" : (0 , math.pi , -10000 , 10000),
                        "wrist_yaw" : (0 , math.pi , -10000 , 10000),
+                       "grip" : (1 , 0.5 , 120 , 50)
                        }
 
         # self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names) # addresses = [128, 129, 130])
