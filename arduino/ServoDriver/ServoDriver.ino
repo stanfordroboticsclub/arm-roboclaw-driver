@@ -1,6 +1,7 @@
 
 #define ADDRESS 131
 #define M1DUTYCOMMAND 32
+#define READVERSION 21
 
 unsigned char buffer[10];
 int i = 0;
@@ -26,11 +27,20 @@ uint16_t crc16(unsigned char *packet, int nBytes) {
   return crc;
 }
 
+char version_string[] = "AATeensy imitating Roboclaw\n";
+
 void setup() {
  pinMode(2,OUTPUT);
  pinMode(3,OUTPUT);
+
+ version_string[0] = ADDRESS;
+ version_string[1] = READVERSION;
+ 
  Serial1.begin(115200);
+  Serial.begin(115200);
 }
+
+
 
 void loop() {
   while( Serial1.available() ){
@@ -44,7 +54,11 @@ void loop() {
     
 
     if(i>0){
-       unsigned int ch = crc16(buffer, 4);
+
+       if(i<2) i=2;
+       uint16_t ch = crc16(buffer, i-2);
+//       unsigned int ch = crc16(buffer, 4);
+       
        if(buffer[0] == ADDRESS &&
           buffer[1] == M1DUTYCOMMAND &&
           ( ((uint16_t)buffer[4])<<8 | ((uint16_t)buffer[5])) == ch)
@@ -52,6 +66,25 @@ void loop() {
             target = buffer[2]<<8 | buffer[3];
             Serial1.write(255);
           }  
+          else if(buffer[0] == ADDRESS &&
+          buffer[1] == READVERSION &&
+          ( ((uint16_t)buffer[2])<<8 | ((uint16_t)buffer[4])) == ch)
+          
+          {
+
+            
+            
+            uint16_t verify = crc16( (unsigned char*)version_string, strlen(version_string)+1);
+
+            Serial.println(verify);
+            Serial1.print(version_string+2);
+            Serial1.write(0);
+            Serial1.write((char)(verify >> 8));
+            Serial1.write((char)verify);
+          }
+
+
+          
           i = 0;
     }
     
