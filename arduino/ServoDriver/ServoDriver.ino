@@ -82,32 +82,26 @@ while (Serial1.available() ){
         }else if(command == READVERSION){
 
       
-              if(!Serial1.available()) break;
-              unsigned char high_crc = Serial1.read();
-              
-              if(!Serial1.available()) break;
-              unsigned char low_crc = Serial1.read();
+//              if(!Serial1.available()) break;
+//              unsigned char high_crc = Serial1.read();
+//              
+//              if(!Serial1.available()) break;
+//              unsigned char low_crc = Serial1.read();
+//
+//              Serial.print("Got high: "); Serial.println(high_crc);
+//              Serial.print("Got low : "); Serial.println(low_crc);
 
-              Serial.print("Got high: "); Serial.println(high_crc);
-              Serial.print("Got low : "); Serial.println(low_crc);
-
-              buffer[0] = address;
-              buffer[1] = command;
-
-              uint16_t ch = crc16(buffer, 2);
-
-              if(( ( ( ((uint16_t)high_crc)<<8) )  | ((uint16_t)low_crc) ) == ch){
                 
-                    uint16_t verify = crc16( (unsigned char*)version_string, strlen(version_string)+1);
+                uint16_t verify = crc16( (unsigned char*)version_string, strlen(version_string)+1);
         
-                    Serial.println(verify);
-                    Serial1.print(version_string+2);
-                    Serial1.write(0);
-                    Serial1.write((char)(verify >> 8));
-                    Serial1.write((char)verify);
-                    Serial.println("version command");
+                Serial.println(verify);
+                Serial1.print(version_string+2);
+                Serial1.write(0);
+                Serial1.write((char)(verify >> 8));
+                Serial1.write((char)verify);
+                Serial.println("version command");
                 
-              }
+            
               
         }
 
