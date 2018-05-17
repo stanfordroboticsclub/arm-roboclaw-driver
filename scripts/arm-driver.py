@@ -5,10 +5,12 @@ import rospy
 from sensor_msgs.msg import JointState
 from roboclaw_interface import RoboClaw
 import math
+import time
 
 class ArmDriver:
 
     def __init__(self):
+        self.on_time = time.time()
         self.joint_names = ["shoulder",
                               "elbow",
                               "wrist_yaw",
@@ -25,14 +27,14 @@ class ArmDriver:
                               "elbow",
                               "wrist_L",
                               "wrist_R",
-                              "grip"]
+                              "grip",
+                               'extra']
                               # "turret",
                               # "wrist_pitch",
 
         # self.manual_names = []
         self.manual_names = ["shoulder",
-                              "elbow",
-                              "grip"]
+                              "elbow"]
                               # "turret",
                               # "wrist_pitch",
 
@@ -58,10 +60,11 @@ class ArmDriver:
                        }
 
         # self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names) # addresses = [128, 129, 130])
-        self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names,addresses = [128,129] ) # addresses = [128, 129, 130])
+        # self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names,addresses = [128,129] ) # addresses = [128, 129, 130])
+        self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names,addresses = [128,129,131] ) # addresses = [128, 129, 130])
 
-        self.rc.speed['wrist_L'] = 5000
-        self.rc.speed['wrist_R'] = 5000
+        self.rc.speed['wrist_L'] = 3000
+        self.rc.speed['wrist_R'] = 3000
 
         rospy.init_node('arm-driver', anonymous=True)
         rospy.Subscriber("/joint_states", JointState, lambda x: self.callback(x) )
@@ -71,7 +74,8 @@ class ArmDriver:
         while not rospy.is_shutdown():
             rospy.loginfo('new loop')
         # while 1:
-            self.write_to_roboclaw()
+            if( time.time() - self.on_time > 5):
+                self.write_to_roboclaw()
             r.sleep()
             # rospy.spinOnce()
 
@@ -86,7 +90,7 @@ class ArmDriver:
                 continue
 
             self.pos[joint] = data.position[ind]
-            self.offset[joint] = data.effort[ind]
+            self.offset[joint] = int(data.effort[ind])
 
         
         rospy.loginfo('call '+str(self.pos['wrist_pitch']) )
@@ -112,6 +116,13 @@ class ArmDriver:
         out = self.rc.drive_position('wrist_L', wrist_L_pulse)
         out2 = self.rc.drive_position('wrist_R', wrist_R_pulse)
 
+
+        #DO MANUAL for Grip
+        position = self.scale(self.pos['grip'], 'grip')
+        offset = self.offset['grip']
+        # self.rc.drive_duty('grip', position + offset)
+
+
         rospy.loginfo('confirmation')
         rospy.loginfo(str(out))
 
@@ -128,6 +139,7 @@ class ArmDriver:
 
 
     def find_serial_port(self):
+        return '/dev/ttyUSB0'
         return '/dev/ttyACM0'
         return '/dev/tty.usbmodem1141'
 
