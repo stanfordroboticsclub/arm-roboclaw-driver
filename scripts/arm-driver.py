@@ -16,10 +16,9 @@ class ArmDriver:
                               "elbow",
                               "wrist_yaw",
                               "wrist_pitch",
+                              "wrist_roll",
                               "grip"]
-                              # "wrist_roll",
                               # "turret",
-                              # "wrist_pitch",
 
         # self.motor_names = ["wrist_L",
         #                       "wrist_R"]
@@ -28,13 +27,14 @@ class ArmDriver:
                               "elbow",
                               "wrist_L",
                               "wrist_R",
+                              "wrist_roll",
+                              "turret",
                               "grip",
                                'extra']
-                              # "turret",
-                              # "wrist_pitch",
 
         # self.manual_names = []
         self.manual_names = ["shoulder",
+                              "wrist_roll",
                               "elbow"]
                               # "turret",
                               # "wrist_pitch",
@@ -43,7 +43,8 @@ class ArmDriver:
                         'elbow': 4,
                     'wrist_pitch': math.pi/2,
                     'wrist_yaw': math.pi/2,
-                    'grip':1}
+                    'grip':1,
+                    'wrist_roll':0}
 
         self.offset = {'shoulder': 0, 
                         'elbow': 0,
@@ -54,16 +55,17 @@ class ArmDriver:
         self.last_grip = 0
                    
 
-        self.convert = { "shoulder" : ( 3 ,4.6 , 150 ,1650),
-                       "elbow" : (3.5 , 5.2 , 60, 1400),
+        self.convert = { "shoulder" : ( 3.07 ,4.7 , 150 ,1580),
+                       "elbow" : (2.794 , 5.92 , 60, 1500),
                        "wrist_pitch" : (0 , math.pi , -10000 , 10000),
                        "wrist_yaw" : (0 , math.pi , -10000 , 10000),
-                       "grip" : (0.5 , 1 , 50 , 120)
+                       "grip" : (0.5 , 1 , 50 , 120),
+                       "wrist_roll" : (-math.pi , math.pi, -10000 , 10000)
                        }
 
         # self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names) # addresses = [128, 129, 130])
         # self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names,addresses = [128,129] ) # addresses = [128, 129, 130])
-        self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names,addresses = [128,129,131] ) # addresses = [128, 129, 130])
+        self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names,addresses = [128,129,130,131] ) # addresses = [128, 129, 130])
 
         self.rc.speed['wrist_L'] = 3000
         self.rc.speed['wrist_R'] = 3000
@@ -116,24 +118,16 @@ class ArmDriver:
         wrist_R_pulse = self.clamp(wrist_R_pulse, -10000,10000) + self.offset[ 'wrist_yaw']
 
 
-        # print "XXXX WRIST L", wrist_L_pulse
-        # print "XXXX WRIST R", wrist_R_pulse
+        print "XXXX WRIST L", wrist_L_pulse
+        print "XXXX WRIST R", wrist_R_pulse
 
         out = self.rc.drive_position('wrist_L', wrist_L_pulse)
         out2 = self.rc.drive_position('wrist_R', wrist_R_pulse)
 
 
-        #DO MANUAL for Grip
-        print "SCLAE" , self.pos['grip']
         position = self.scale(self.pos['grip'], 'grip')
         offset = self.offset['grip']
-
-        print "POS", position
         print "GRIP", position + offset
-
-        if(self.last_grip != position + offset):
-            print "CAHNGED"
-            self.last_grip = position + offset
         self.rc.drive_duty('grip', position + offset)
 
 
