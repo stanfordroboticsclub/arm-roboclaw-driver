@@ -55,8 +55,8 @@ class ArmDriver:
         self.last_grip = 0
                    
 
-        self.convert = { "shoulder" : ( 3.07 ,4.7 , 150 ,1580),
-                       "elbow" : (2.794 , 5.92 , 60, 1500),
+        self.convert = { "shoulder" : ( 2.93 ,4.54 , 150 ,1580),
+                       "elbow" : (3.52 , 5.12 , 60, 1500),
                        "wrist_pitch" : (0 , math.pi , -10000 , 10000),
                        "wrist_yaw" : (0 , math.pi , -10000 , 10000),
                        "grip" : (0.5 , 1 , 50 , 120),
