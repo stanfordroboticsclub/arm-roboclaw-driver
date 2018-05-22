@@ -17,8 +17,8 @@ class ArmDriver:
                               "wrist_yaw",
                               "wrist_pitch",
                               "wrist_roll",
+                              "turret",
                               "grip"]
-                              # "turret",
 
         # self.motor_names = ["wrist_L",
         #                       "wrist_R"]
@@ -35,8 +35,8 @@ class ArmDriver:
         # self.manual_names = []
         self.manual_names = ["shoulder",
                               "wrist_roll",
+                              "turret",
                               "elbow"]
-                              # "turret",
                               # "wrist_pitch",
 
         self.pos = {'shoulder': 4, 
@@ -44,12 +44,14 @@ class ArmDriver:
                     'wrist_pitch': math.pi/2,
                     'wrist_yaw': math.pi/2,
                     'grip':1,
+                    'turret': 0,
                     'wrist_roll':0}
 
         self.offset = {'shoulder': 0, 
                         'elbow': 0,
                     'wrist_pitch': 0,
                     'wrist_yaw': 0,
+                    'turret': 0,
                        'grip':0}
         
         self.last_grip = 0
@@ -60,7 +62,8 @@ class ArmDriver:
                        "wrist_pitch" : (0 , math.pi , -10000 , 10000),
                        "wrist_yaw" : (0 , math.pi , -10000 , 10000),
                        "grip" : (0.5 , 1 , 50 , 120),
-                       "wrist_roll" : (-math.pi , math.pi, -10000 , 10000)
+                       "wrist_roll" : (-math.pi , math.pi, -10000 , 10000),
+                       "turret" : (math.pi/2 , -math.pi/2, -10000 , 10000)
                        }
 
         # self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names) # addresses = [128, 129, 130])
