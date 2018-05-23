@@ -20,9 +20,6 @@ class ArmDriver:
                               "turret",
                               "grip"]
 
-        # self.motor_names = ["wrist_L",
-        #                       "wrist_R"]
-
         self.motor_names = ["shoulder",
                               "elbow",
                               "wrist_L",
@@ -115,13 +112,13 @@ class ArmDriver:
         pulse_pitch = self.scale(self.pos['wrist_pitch'], 'wrist_pitch')
         pulse_yaw = self.scale(self.pos['wrist_yaw'], 'wrist_yaw')
 
-        wrist_L_pulse = pulse_pitch + pulse_yaw
-        wrist_R_pulse = pulse_pitch - pulse_yaw
+        wrist_L_pulse =  - pulse_pitch + pulse_yaw
+        wrist_R_pulse =  - pulse_pitch - pulse_yaw
 
         wrist_L_pulse = self.clamp(wrist_L_pulse, -10000,10000) \
-                            + self.offset[ 'wrist_pitch'] + self.offset[ 'wrist_yaw']
+                            - self.offset[ 'wrist_pitch'] + self.offset[ 'wrist_yaw']
         wrist_R_pulse = self.clamp(wrist_R_pulse, -10000,10000) \
-                            + self.offset[ 'wrist_pitch'] - self.offset[ 'wrist_yaw']
+                            - self.offset[ 'wrist_pitch'] - self.offset[ 'wrist_yaw']
 
 
         print "WRIST L", wrist_L_pulse
