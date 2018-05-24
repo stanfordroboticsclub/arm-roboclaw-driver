@@ -1,0 +1,11 @@
+
+
+
+
+
+actuator  kreal_length   angle    pulse   blender_length
+elbow_short     19  	    143.6	60
+elbow_long    6           34.9      1500
+
+shoulder_short xxx    12 hoz    150
+shoulder_long  xx     9 ver	1580

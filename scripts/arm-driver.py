@@ -66,12 +66,13 @@ class ArmDriver:
                        "turret" : (math.pi/2 , -math.pi/2, -10000 , 10000)
                        }
 
-        # self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names) # addresses = [128, 129, 130])
-        # self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names,addresses = [128,129] ) # addresses = [128, 129, 130])
         self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names,addresses = [128,129,130,131] ) # addresses = [128, 129, 130])
 
         self.rc.speed['wrist_L'] = 3000
         self.rc.speed['wrist_R'] = 3000
+
+        self.rc.speed['shoulder'] = 80
+        self.rc.speed['elbow'] = 120
 
         rospy.init_node('arm-driver', anonymous=True)
         rospy.Subscriber("/joint_states", JointState, lambda x: self.callback(x) )
@@ -117,12 +118,14 @@ class ArmDriver:
         wrist_L_pulse = pulse_pitch + pulse_yaw
         wrist_R_pulse = pulse_pitch - pulse_yaw
 
-        wrist_L_pulse = self.clamp(wrist_L_pulse, -10000,10000) + self.offset[ 'wrist_pitch']
-        wrist_R_pulse = self.clamp(wrist_R_pulse, -10000,10000) + self.offset[ 'wrist_yaw']
+        wrist_L_pulse = self.clamp(wrist_L_pulse, -10000,10000) \
+                            + self.offset[ 'wrist_pitch'] + self.offset[ 'wrist_yaw']
+        wrist_R_pulse = self.clamp(wrist_R_pulse, -10000,10000) \
+                            + self.offset[ 'wrist_pitch'] - self.offset[ 'wrist_yaw']
 
 
-        print "XXXX WRIST L", wrist_L_pulse
-        print "XXXX WRIST R", wrist_R_pulse
+        print "WRIST L", wrist_L_pulse
+        print "WRIST R", wrist_R_pulse
 
         out = self.rc.drive_position('wrist_L', wrist_L_pulse)
         out2 = self.rc.drive_position('wrist_R', wrist_R_pulse)
@@ -134,7 +137,6 @@ class ArmDriver:
         self.rc.drive_duty('grip', position + offset)
 
 
-        rospy.loginfo('confirmation')
         rospy.loginfo(str(out))
 
     def clamp(self,val, mi, ma):
