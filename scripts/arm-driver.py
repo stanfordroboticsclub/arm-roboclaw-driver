@@ -29,12 +29,8 @@ class ArmDriver:
                               "grip",
                                'extra']
 
-        # self.manual_names = []
-        self.manual_names = ["shoulder",
-                              "wrist_roll",
-                              "turret",
-                              "elbow"]
-                              # "wrist_pitch",
+        self.manual_names = ["wrist_roll",
+                              "turret"]
 
         self.pos = {'shoulder': 4, 
                         'elbow': 4,
@@ -52,7 +48,10 @@ class ArmDriver:
                        'grip':0}
         
         self.last_grip = 0
-                   
+
+        self.last_shoulder_command = 0
+        self.last_elbow_command = 0
+        self.shoulder_done = True
 
         self.convert = { "shoulder" : ( 2.93 ,4.54 , 150 ,1580),
                        "elbow" : (3.52 , 5.12 , 60, 1500),
@@ -107,6 +106,30 @@ class ArmDriver:
             offset = int(self.offset[joint])
             self.rc.drive_position(joint, position + offset)
 
+        # do manual calc for shoulder and elbow
+
+        position_shoulder = self.scale(self.pos['shoulder'], 'shoulder')
+        offset_shoulder = self.offset['shoulder']
+        shoulder_setpoint = position_shoulder + offset_shoulder
+
+        if fabs(self.rc.read_encoder('s')[1] - shoulder_setpoint) < 3:
+            self.shoulder_done = True
+
+        if shoulder_setpoint != self.last_shoulder_command:
+            self.shoulder_done = False
+
+        if shoulder_done:
+            self.rc.drive_duty('shoulder',0)
+        else:
+            self.rc.drive_duty('shoulder', position_shoulder + offset_shoulder)
+
+        self.last_shoulder_command = shoulder_setpoint
+
+
+        position_elbow = self.scale(self.pos['elbow'], 'elbow')
+        offset_elbow = self.offset['elbow']
+        self.rc.drive_duty('elbow', position_elbow + offset_elbow)
+
 
         #Do Manual calc for wrist
         pulse_pitch = self.scale(self.pos['wrist_pitch'], 'wrist_pitch')
@@ -128,6 +151,8 @@ class ArmDriver:
         out2 = self.rc.drive_position('wrist_R', wrist_R_pulse)
 
 
+
+        #Do Manual calc for gripper
         position = self.scale(self.pos['grip'], 'grip')
         offset = self.offset['grip']
         print "GRIP", position + offset
