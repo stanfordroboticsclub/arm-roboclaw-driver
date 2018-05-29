@@ -112,23 +112,23 @@ class ArmDriver:
         offset_shoulder = self.offset['shoulder']
         shoulder_setpoint = position_shoulder + offset_shoulder
 
-        if math.fabs(self.rc.read_encoder('s')[1] - shoulder_setpoint) < 3:
+        if math.fabs(self.rc.read_encoder('shoulder')[1] - shoulder_setpoint) < 3:
             self.shoulder_done = True
 
         if shoulder_setpoint != self.last_shoulder_command:
             self.shoulder_done = False
 
-        if shoulder_done:
+        if self.shoulder_done:
             self.rc.drive_duty('shoulder',0)
         else:
-            self.rc.drive_duty('shoulder', position_shoulder + offset_shoulder)
+            self.rc.drive_position('shoulder', position_shoulder + offset_shoulder)
 
         self.last_shoulder_command = shoulder_setpoint
 
 
         position_elbow = self.scale(self.pos['elbow'], 'elbow')
         offset_elbow = self.offset['elbow']
-        self.rc.drive_duty('elbow', position_elbow + offset_elbow)
+        self.rc.drive_position('elbow', position_elbow + offset_elbow)
 
 
         #Do Manual calc for wrist
