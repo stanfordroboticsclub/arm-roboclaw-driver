@@ -52,6 +52,7 @@ class ArmDriver:
         self.last_shoulder_command = 0
         self.last_elbow_command = 0
         self.shoulder_done = True
+        self.elbow_done = True
 
         self.convert = { "shoulder" : ( 2.93 ,4.54 , 150 ,1580),
                        "elbow" : (3.52 , 5.12 , 60, 1500),
@@ -106,8 +107,7 @@ class ArmDriver:
             offset = int(self.offset[joint])
             self.rc.drive_position(joint, position + offset)
 
-        # do manual calc for shoulder and elbow
-
+        # do manual calc for shoulder
         position_shoulder = self.scale(self.pos['shoulder'], 'shoulder')
         offset_shoulder = self.offset['shoulder']
         shoulder_setpoint = position_shoulder + offset_shoulder
@@ -126,9 +126,27 @@ class ArmDriver:
         self.last_shoulder_command = shoulder_setpoint
 
 
+        # do manual calc for elbow
         position_elbow = self.scale(self.pos['elbow'], 'elbow')
         offset_elbow = self.offset['elbow']
-        self.rc.drive_position('elbow', position_elbow + offset_elbow)
+        elbow_setpoint = position_elbow + offset_elbow
+
+        if math.fabs(self.rc.read_encoder('elbow')[1] - elbow_setpoint) < 3:
+            self.elbow_done = True
+
+        if elbow_setpoint != self.last_elbow_command:
+            self.elbow_done = False
+
+        if self.elbow_done:
+            self.rc.drive_duty('elbow',0)
+        else:
+            self.rc.drive_position('elbow', position_elbow + offset_elbow)
+
+        self.last_elbow_command = elbow_setpoint
+
+        # position_elbow = self.scale(self.pos['elbow'], 'elbow')
+        # offset_elbow = self.offset['elbow']
+        # self.rc.drive_position('elbow', position_elbow + offset_elbow)
 
 
         #Do Manual calc for wrist
