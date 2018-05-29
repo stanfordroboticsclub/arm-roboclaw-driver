@@ -112,7 +112,7 @@ class ArmDriver:
         offset_shoulder = self.offset['shoulder']
         shoulder_setpoint = position_shoulder + offset_shoulder
 
-        if fabs(self.rc.read_encoder('s')[1] - shoulder_setpoint) < 3:
+        if math.fabs(self.rc.read_encoder('s')[1] - shoulder_setpoint) < 3:
             self.shoulder_done = True
 
         if shoulder_setpoint != self.last_shoulder_command:
