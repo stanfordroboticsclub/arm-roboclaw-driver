@@ -55,11 +55,11 @@ class ArmDriver:
 
         self.convert = { "shoulder" : ( 2.93 ,4.54 , 150 ,1580),
                        "elbow" : (3.52 , 5.12 , 60, 1500),
-                       "wrist_pitch" : (0 , math.pi , -10000 , 10000),
-                       "wrist_yaw" : (0 , math.pi , -10000 , 10000),
+                       "wrist_pitch" : (0 , math.pi , -10382 , 10382),
+                       "wrist_yaw" : (0 , math.pi , -10382 , 10382),
                        "grip" : (0.5 , 1 , 50 , 120),
                        "wrist_roll" : (-math.pi , math.pi, -10000 , 10000),
-                       "turret" : (math.pi/2 , -math.pi/2, -10000 , 10000)
+                       "turret" : (math.pi/2 , -math.pi/2, -8651 , 8651)
                        }
 
         self.rc = RoboClaw(self.find_serial_port(), names = self.motor_names,addresses = [128,129,130,131] ) # addresses = [128, 129, 130])
